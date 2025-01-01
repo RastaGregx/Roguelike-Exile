@@ -1,42 +1,68 @@
 #include "raylib.h"
-#include <cstdlib>
-#include <ctime>
+#include "player/movement.h"
+#include "player/player.h"
 
+enum GameScreen { TITLE, GAMEPLAY, GAMEOVER };
 
 int main() {
-    // Virtual resolution (design resolution)
-    const int virtualWidth = 800;
-    const int virtualHeight = 600;
 
-    // Set window to be resizable
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(virtualWidth, virtualHeight, "Virtual Resolution Example");
-
-    // Set target FPS
+    const int screenWidth = 2560;
+    const int screenHeight = 1340;  
+    InitWindow(screenWidth, screenHeight, "Roguelike Exile");
     SetTargetFPS(60);
 
+    Font font = LoadFont("resources/fonts/modern.ttf");
+    GameScreen currentScreen = TITLE;
+    bool isPlaying = false;
+
+ //   Player player;
+ //   InitPlayer(player, screenWidth / 2 - 25, screenHeight / 2 - 25, 200.0f);  // Initialize player
+
+    Vector2 playerPosition = { screenWidth / 2 - 25, screenHeight / 2 - 25 };
+
+
+
+
     // Main game loop
-    while (!WindowShouldClose()) { // Detect window close button or ESC key
+    while (!WindowShouldClose()) {
 
-        // Calculate scaling factors for virtual resolution
-        float scaleX = (float)GetScreenWidth() / virtualWidth;
-        float scaleY = (float)GetScreenHeight() / virtualHeight;
+        float deltaTime = GetFrameTime(); 
 
-        // Begin drawing
+        if (currentScreen == TITLE) {
+            if (IsKeyPressed(KEY_ENTER)) {
+                currentScreen = GAMEPLAY;
+                isPlaying = true;
+            }
+        } else if (currentScreen == GAMEOVER) {
+            if (IsKeyPressed(KEY_ENTER)) {
+                currentScreen = TITLE;
+            }
+        }
+
+        if (currentScreen == GAMEPLAY) {
+            UpdatePlayerMovement(playerPosition, deltaTime);
+        }
+
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        // Apply virtual resolution scaling
-        BeginScissorMode(0, 0, GetScreenWidth(), GetScreenHeight());
-        DrawText("Scaled to Virtual Resolution", (int)(200 * scaleX), (int)(200 * scaleY), (int)(20 * scaleX), LIGHTGRAY);
-        EndScissorMode();
+        if (currentScreen == TITLE) {
+            DrawTextEx(font, "GAME MENU", Vector2{screenWidth / 2 - 150, screenHeight / 2 - 100}, 40, 2, BLACK);
+            DrawTextEx(font, "Press ENTER to start", Vector2{screenWidth / 2 - 140, screenHeight / 2 + 20}, 20, 2, DARKGRAY);
+        } else if (currentScreen == GAMEPLAY) {
+            if (isPlaying) {
+                DrawRectangleV(playerPosition, { 50, 50 }, RED);  // A blue cube of 50x50
+            }
+        } else if (currentScreen == GAMEOVER) {
+            DrawTextEx(font, "GAME OVER", Vector2{screenWidth / 2 - 100, screenHeight / 2 - 50}, 40, 2, RED);
+            DrawTextEx(font, "Press ENTER to return to menu", Vector2{screenWidth / 2 - 160, screenHeight / 2 + 30}, 20, 2, DARKGRAY);
+        }
 
         EndDrawing();
     }
 
-    // De-Initialization
-    CloseWindow(); // Close window and OpenGL context
+    UnloadFont(font);
+    CloseWindow(); 
 
     return 0;
 }
-

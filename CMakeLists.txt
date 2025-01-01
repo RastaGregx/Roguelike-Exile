@@ -28,11 +28,13 @@ FetchContent_MakeAvailable(raylib)
 set(SOURCES
     src/roguelike_exile.cpp
     src/player/player.cpp
+    src/player/movement.cpp
     src/enemy.cpp
 )
 
 set(HEADERS
     include/player/player.h
+    include/player/movement.h
     include/enemy.h
 )
 

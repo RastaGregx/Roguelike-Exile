@@ -1,8 +1,9 @@
+// src/player/player.cpp
 #include "player/player.h"
-#include <iostream>
+#include "raylib.h"
 
-Player::Player(const std::string& name) : name(name) {}
-
-void Player::greet() const {
-    std::cout << "Hello, I am " << name << ", ready for adventure!" << std::endl;
+void InitPlayer(Player &player, char name, float x, float y, float speed) {
+    player.position = { x, y };
+    player.speed = speed;
 }
+

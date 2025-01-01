@@ -1,15 +1,16 @@
+// player.h
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <string>
+#include "raylib.h"
 
 class Player {
 public:
-    Player(const std::string& name);
-    void greet() const;
+    Vector2 position;  // The position of the player on the screen
+    float speed;       // The movement speed of the player
 
-private:
-    std::string name;
+    Player(float x, float y, float spd);
+
 };
 
 #endif // PLAYER_H
