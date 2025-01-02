@@ -31,9 +31,9 @@ int main() {
     Attack playerAttack; 
 
     objects.push_back(Object(500, 500, 200, 20));  // A wall at (500, 500) with size 200x20
-    objects.push_back(Object(800, 800, 200, 20));
+    //objects.push_back(Object(800, 800, 200, 20));
 
-    enemies.push_back(Enemy(Vector2{1000, 800}, 100.0f, RED));
+    enemies.push_back(Enemy(Vector2{800, 400}, 100.0f, RED));
 
     // Main game loop
     while (!WindowShouldClose()) {
@@ -99,7 +99,10 @@ int main() {
 
             // Check if player collides with any enemy
             for (auto& enemy : enemies) {
-                enemy.Update(playerPosition, deltaTime);
+                for (auto& enemy : enemies) {
+                    enemy.Update(playerPosition, deltaTime, objects); // Pass objects for collision detection
+                }
+
 
                 // Check if enemy collides with player (simple collision detection)
                 float distance = Vector2Distance(playerPosition, enemy.position);

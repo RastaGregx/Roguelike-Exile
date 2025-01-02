@@ -29,6 +29,7 @@ set(SOURCES
     src/roguelike_exile.cpp
     src/player/player.cpp
     src/player/movement.cpp
+    src/enemies/enemy.cpp
     src/map.cpp
 )
 
