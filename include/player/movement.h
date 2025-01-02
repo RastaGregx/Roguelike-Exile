@@ -1,10 +1,11 @@
-// src/player/movement.h
+// movement.h
 #ifndef MOVEMENT_H
 #define MOVEMENT_H
 
 #include "raylib.h"
+#include <vector>
+#include "object.h"
 
-// Function to update the cube's position based on user input
-void UpdatePlayerMovement(Vector2 &playerPosition, float deltaTime);
+void UpdatePlayerMovement(Vector2 &playerPosition, float deltaTime, const std::vector<Object>& objects, Camera2D camera);
 
-#endif
+#endif // MOVEMENT_H

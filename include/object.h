@@ -1,3 +1,4 @@
+// object.h
 #ifndef OBJECT_H
 #define OBJECT_H
 
@@ -12,8 +13,8 @@ public:
         rect = {x, y, width, height};
     }
 
-    // Check if the player collides with the object
-    bool CheckCollision(Rectangle playerRect) {
+    // Check if the player collides with the object (now const)
+    bool CheckCollision(Rectangle playerRect) const {
         return CheckCollisionRecs(playerRect, rect);
     }
 };
