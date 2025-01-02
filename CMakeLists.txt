@@ -29,14 +29,13 @@ set(SOURCES
     src/roguelike_exile.cpp
     src/player/player.cpp
     src/player/movement.cpp
-    src/enemy.cpp
     src/map.cpp
 )
 
 set(HEADERS
     include/player/player.h
     include/player/movement.h
-    include/enemy.h
+    include/enemies/enemy.h
     include/object.h
     include/map.h
 )
