@@ -4,7 +4,7 @@
 
 #include "raylib.h"
 #include <vector>
-#include "object.h"
+#include "objects/object.h"
 
 void UpdatePlayerMovement(Vector2 &playerPosition, float deltaTime, const std::vector<Object>& objects, Camera2D camera);
 

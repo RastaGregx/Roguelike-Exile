@@ -1,13 +1,18 @@
 #include "raylib.h"
+
 #include "player/player.h"
 #include "player/movement.h"
 #include "player/attack.h"
+
 #include "enemies/enemy.h" 
-#include "object.h"
+#include "objects/object.h"
 #include "map.h"
+
 #include <vector>
 #include <raymath.h>
 #include <iostream>
+#include <algorithm>
+
 
 enum GameScreen { TITLE, GAMEPLAY, GAMEOVER };
 
@@ -20,6 +25,7 @@ int main() {
 
     Font font = LoadFont("resources/fonts/modern.ttf");
     GameScreen currentScreen = TITLE;
+
     bool isPlaying = false;
     bool playerDead = false;
 
@@ -28,41 +34,32 @@ int main() {
 
     std::vector<Object> objects;
     std::vector<Enemy> enemies;
+
     Attack playerAttack; 
-
-    objects.push_back(Object(500, 500, 200, 20));  // A wall at (500, 500) with size 200x20
-    //objects.push_back(Object(800, 800, 200, 20));
-
-    enemies.push_back(Enemy(Vector2{800, 400}, 100.0f, RED));
 
     // Main game loop
     while (!WindowShouldClose()) {
 
         float deltaTime = GetFrameTime(); 
 
-        // Debugging: Print the current state for debugging
-        //printf("Current Screen: %d | Player Dead: %d\n", currentScreen, playerDead);
-
         // Handle screen transitions and game states
         if (currentScreen == TITLE) {
             if (IsKeyPressed(KEY_ENTER)) {
-                //printf("Transitioning to GAMEPLAY\n");
                 currentScreen = GAMEPLAY;
                 isPlaying = true;
-                playerDead = false;  // Reset player state when starting a new game
-                playerPosition = { screenWidth / 2 - 25, screenHeight / 2 - 25 };  // Reset player position
-                enemies.clear();  // Clear existing enemies
-                enemies.push_back(Enemy(Vector2{1000, 800}, 100.0f, RED));  // Add initial enemy
+                playerDead = false;
+                playerPosition = { screenWidth / 2 - 25, screenHeight / 2 - 25 };
+                enemies.clear();
+                enemies.push_back(Enemy(Vector2{1000, 800}, 100.0f, RED, 50)); // 50 HP enemy  
+                objects.push_back(Object(500, 500, 200, 20));
+                objects.push_back(Object(800, 800, 200, 20));
             }
         } 
-        else if (currentScreen == GAMEOVER) {
-            //printf("GAMEOVER state active.\n");
 
+        else if (currentScreen == GAMEOVER) {
             if (IsKeyPressed(KEY_ENTER)) {
-                //printf("KEY_ENTER detected. Transitioning to TITLE...\n");
                 currentScreen = TITLE;
 
-                // Reset game state
                 isPlaying = false;
                 playerDead = false;
                 playerPosition = { screenWidth / 2 - 25, screenHeight / 2 - 25 };
@@ -75,11 +72,7 @@ int main() {
             }
         }
 
-        // Handle gameplay logic
         if (currentScreen == GAMEPLAY && !playerDead) {
-            // Debugging: Ensure the player is moving and is alive
-            //printf("Player Position: (%.2f, %.2f) | Is Alive: %d\n", playerPosition.x, playerPosition.y, !playerDead);
-
             UpdatePlayerMovement(playerPosition, deltaTime, objects, camera);
 
             Vector2 mousePosition = GetMousePosition();
@@ -97,26 +90,38 @@ int main() {
                 //printf("Shooting projectile\n");
             }
 
-            // Check if player collides with any enemy
+            for (auto& projectile : playerAttack.projectiles) {
+            for (auto& enemy : enemies) {
+                if (enemy.IsAlive() &&
+                    CheckCollisionCircles(projectile.position, projectile.radius, enemy.position, 20.0f)) {
+                    enemy.TakeDamage(10);
+                    projectile.active = false;
+                    printf("Enemy hit! Health: %d\n", enemy.health);
+                }
+            }
+            }
+            enemies.erase(
+            std::remove_if(enemies.begin(), enemies.end(), [](const Enemy& e) { return !e.IsAlive(); }),
+            enemies.end()
+            );
+
             for (auto& enemy : enemies) {
                 for (auto& enemy : enemies) {
-                    enemy.Update(playerPosition, deltaTime, objects); // Pass objects for collision detection
+                    enemy.Update(playerPosition, deltaTime, objects);
                 }
 
 
-                // Check if enemy collides with player (simple collision detection)
                 float distance = Vector2Distance(playerPosition, enemy.position);
-                float combinedRadii = 25.0f + 20.0f;  // Assuming player is 50x50, enemy is 40x40
+                float combinedRadii = 25.0f + 20.0f; 
 
                 if (distance < combinedRadii && !playerDead) {
-                    //printf("Player collided with enemy\n");
-                    playerDead = true;  // Set player death flag if collision occurs
-                    currentScreen = GAMEOVER;  // Transition to GAMEOVER state
-                    break;  // No need to check further enemies if the player is dead
+                    playerDead = true; 
+                    currentScreen = GAMEOVER; 
+                    break; 
                 }
             }
 
-            playerAttack.Update(deltaTime, objects);
+            playerAttack.Update(deltaTime, enemies, objects);
 
             camera.target = (Vector2){ playerPosition.x + 20.0f, playerPosition.y + 20.0f };
             camera.offset = (Vector2){ screenWidth/2.0f, screenHeight/2.0f };
@@ -126,9 +131,6 @@ int main() {
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
-
-        // Debugging: Print the player's position
-        //printf("Player Position: (%.2f, %.2f)\n", playerPosition.x, playerPosition.y);
 
         // Temporary: Debugging player position
         DrawText(TextFormat("Player Position: %.2f, %.2f", playerPosition.x, playerPosition.y), 10, 10, 20, DARKGRAY);

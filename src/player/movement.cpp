@@ -1,6 +1,6 @@
 #include "player/movement.h"
 #include "raylib.h"
-#include "object.h"
+#include "objects/object.h"
 #include <vector>
 
 const float playerSpeed = 300.0f;  // Speed in pixels per second
