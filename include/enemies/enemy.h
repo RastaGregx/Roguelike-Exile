@@ -2,21 +2,27 @@
 #define ENEMY_H
 
 #include "raylib.h"
-#include <vector>
+#include "player/player.h"
 #include "objects/object.h"
+#include <vector>  // Include this line to use std::vector
 
 class Enemy {
 public:
-    Vector2 position;
-    float speed;
-    Color color;
-    int health; // New: Enemy health
+    Vector2 position; // Position of the enemy
+    float speed;      // Speed of the enemy
+    Color color;      // Color of the enemy
+    int health;       // Health of the enemy
+    float width;
 
+    // Constructor
     Enemy(Vector2 pos, float spd, Color col, int hp);
 
-    void Update(Vector2 playerPosition, float deltaTime, const std::vector<Object>& objects);
-    void TakeDamage(int damage); // New: Reduce health
-    bool IsAlive() const;        // New: Check if enemy is still alive
+    // Update method, with Player reference as the fourth parameter
+    void Update(Vector2 playerPosition, float deltaTime, const std::vector<Object>& objects, Player &player);
+
+    // Other methods...
+    void TakeDamage(int damage);
+    bool IsAlive() const;
     void Draw() const;
 };
 

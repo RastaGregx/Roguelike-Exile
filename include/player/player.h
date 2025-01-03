@@ -1,16 +1,21 @@
-// player.h
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "raylib.h"
+#include "raylib.h"  // Include raylib for Vector2
 
-class Player {
-public:
-    Vector2 position;  // The position of the player on the screen
-    float speed;       // The movement speed of the player
-
-    Player(float x, float y, float spd);
-
+// Define the Player struct
+struct Player {
+    Vector2 position;
+    float speed;
+    float width;
+    float height;
+    int hp;
 };
+
+// Function declarations
+void InitPlayer(Player &player, float x, float y, float speed, float width, float height, int hp);
+void TakeDamage(Player &player, int damage);
+
+
 
 #endif // PLAYER_H

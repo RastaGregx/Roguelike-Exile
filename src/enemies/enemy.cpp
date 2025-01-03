@@ -1,48 +1,33 @@
 #include "enemies/enemy.h"
+#include "player/player.h"
 #include "raymath.h"
+#include <iostream>
 
 Enemy::Enemy(Vector2 pos, float spd, Color col, int hp)
     : position(pos), speed(spd), color(col), health(hp) {}
 
-void Enemy::Update(Vector2 playerPosition, float deltaTime, const std::vector<Object>& objects) {
-    // Same Update logic as before, with movement and collision checks
+void Enemy::Update(Vector2 playerPosition, float deltaTime, const std::vector<Object>& objects, Player &player) {
     Vector2 direction = Vector2Subtract(playerPosition, position);
-
     if (Vector2Length(direction) > 0) {
         direction = Vector2Normalize(direction);
     }
 
-    Vector2 proposedPosition = Vector2Add(position, Vector2Scale(direction, speed * deltaTime));
-    Vector2 adjustedPosition = position;
+    Vector2 scaledMovement = Vector2Scale(direction, speed * deltaTime);
+    position = Vector2Add(position, scaledMovement);
 
-    // Resolve X movement
-    Vector2 proposedXPosition = { proposedPosition.x, position.y };
-    bool collidingX = false;
-    for (const auto& obj : objects) {
-        if (CheckCollisionCircleRec(proposedXPosition, 20.0f, obj.rect)) {
-            collidingX = true;
-            break;
-        }
-    }
-    if (!collidingX) {
-        adjustedPosition.x = proposedXPosition.x;
-    }
+    float distance = Vector2Distance(position, player.position);
+    float combinedRadius = (width / 2) + (player.width / 2);
 
-    // Resolve Y movement
-    Vector2 proposedYPosition = { position.x, proposedPosition.y };
-    bool collidingY = false;
-    for (const auto& obj : objects) {
-        if (CheckCollisionCircleRec(proposedYPosition, 20.0f, obj.rect)) {
-            collidingY = true;
-            break;
-        }
-    }
-    if (!collidingY) {
-        adjustedPosition.y = proposedYPosition.y;
-    }
+    std::cout << "Enemy Pos: " << position.x << ", " << position.y
+              << " | Player Pos: " << player.position.x << ", " << player.position.y
+              << " | Distance: " << distance << " | Combined Radius: " << combinedRadius << "\n";
 
-    position = adjustedPosition;
+    if (distance < combinedRadius) {
+        ::TakeDamage(player, 10);
+        std::cout << "Collision detected! Player HP: " << player.hp << "\n";
+    }
 }
+
 
 void Enemy::TakeDamage(int damage) {
     health -= damage; // Reduce health by the damage amount

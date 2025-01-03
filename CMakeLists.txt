@@ -27,17 +27,40 @@ FetchContent_MakeAvailable(raylib)
 # Source and header files
 set(SOURCES
     src/roguelike_exile.cpp
+
     src/player/player.cpp
     src/player/movement.cpp
+    src/player/attack.cpp
+
     src/enemies/enemy.cpp
+    src/enemies/enemyManager.cpp
+
+    src/objects/objectManager.cpp
+
+    src/utils/collision.cpp
+    src/utils/gameState.cpp
+    src/utils/inputControl.cpp
+    src/utils/drawingUI.cpp
+
     src/map.cpp
 )
 
 set(HEADERS
     include/player/player.h
     include/player/movement.h
+    include/player/attack.h
+
     include/enemies/enemy.h
-    include/object.h
+    include/enemies/enemyManager.h
+
+    include/objects/objectManager.h
+    include/objects/object.h
+
+    include/utils/collision.h
+    include/utils/gameState.h
+    include/utils/inputControl.h
+    include/utils/drawingUI.h
+
     include/map.h
 )
 

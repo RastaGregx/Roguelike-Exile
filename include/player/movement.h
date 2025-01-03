@@ -1,11 +1,11 @@
-// movement.h
 #ifndef MOVEMENT_H
 #define MOVEMENT_H
 
 #include "raylib.h"
-#include <vector>
 #include "objects/object.h"
+#include "player/player.h"
+#include <vector>
 
-void UpdatePlayerMovement(Vector2 &playerPosition, float deltaTime, const std::vector<Object>& objects, Camera2D camera);
+void UpdatePlayerMovement(Player &player, float deltaTime, const std::vector<Object>& objects, Camera2D &camera);
 
-#endif // MOVEMENT_H
+#endif
