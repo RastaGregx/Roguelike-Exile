@@ -2,14 +2,34 @@
 #include "player/player.h"
 #include "raymath.h"
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
 
+// Constructor
 Enemy::Enemy(Vector2 pos, float spd, Color col, int hp)
-    : position(pos), speed(spd), color(col), health(hp) {}
+    : position(pos), speed(spd), color(col), health(hp), width(40.0f),
+      attackCooldown(1.0f), lastAttackTime(0.0f), pushbackStrength(50.0f), collisionRadius(20.0f) {
+    std::srand(std::time(nullptr)); // Seed for randomness
+}
 
-void Enemy::Update(Vector2 playerPosition, float deltaTime, const std::vector<Object>& objects, Player& player) {
+// Factory function to create a level-scaled enemy
+Enemy Enemy::CreateEnemy(Vector2 pos, int level) {
+    float baseSpeed = 100.0f;       // Base speed
+    int baseHealth = 50;           // Base health
+    float speedMultiplier = 1.1f;  // Speed increases by 10% per level
+    int healthIncrement = 10;      // Health increases by 10 per level
+
+    // Scale stats based on level
+    float scaledSpeed = baseSpeed * std::pow(speedMultiplier, level - 1);
+    int scaledHealth = baseHealth + (healthIncrement * (level - 1));
+
+    return Enemy(pos, scaledSpeed, RED, scaledHealth);
+}
+
+void Enemy::Update(Vector2 playerPosition, float deltaTime, const std::vector<Object>& objects, Player& player, std::vector<Enemy>& enemies) {
     // Direction vector towards the player
     Vector2 direction = Vector2Subtract(playerPosition, position);
-    
+
     // Normalize the direction if not zero-length
     if (Vector2Length(direction) > 0) {
         direction = Vector2Normalize(direction);
@@ -21,82 +41,87 @@ void Enemy::Update(Vector2 playerPosition, float deltaTime, const std::vector<Ob
     // Check if the new position collides with any objects (walls)
     bool collidesWithWall = false;
     for (const auto& obj : objects) {
-        if (obj.IsActive() && CheckCollisionCircleRec(potentialPosition, 20.0f, obj.rect)) {
+        if (obj.IsActive() && CheckCollisionCircleRec(potentialPosition, collisionRadius, obj.rect)) {
             collidesWithWall = true;
             break;
         }
     }
 
-    // If no collision, move towards the player
-    if (!collidesWithWall) {
+    // Check if the new position collides with any other enemies
+    bool collidesWithEnemy = false;
+    for (const auto& otherEnemy : enemies) {
+        if (&otherEnemy != this && otherEnemy.IsAlive() && Vector2Distance(potentialPosition, otherEnemy.position) < collisionRadius * 2) {
+            collidesWithEnemy = true;
+            break;
+        }
+    }
+
+    // If no collision with walls or enemies, move towards the player
+    if (!collidesWithWall && !collidesWithEnemy) {
         position = potentialPosition;
     } else {
-        // If there’s a collision, try moving in other directions
-        // For example, move to the right
-        Vector2 rightDirection = Vector2Rotate(direction, PI / 2); // Rotate 90 degrees
-        Vector2 potentialRight = Vector2Add(position, Vector2Scale(rightDirection, speed * deltaTime));
+        // Fallback mechanism
+        bool moved = false;
+        for (int i = 0; i < 5; ++i) { // Try up to 5 random directions
+            float randomAngle = ((std::rand() % 360) * PI) / 180.0f; // Random angle in radians
+            Vector2 randomDirection = Vector2Rotate(direction, randomAngle);
+            Vector2 randomPosition = Vector2Add(position, Vector2Scale(randomDirection, speed * deltaTime));
 
-        // Check if the right movement is clear
-        bool canMoveRight = true;
-        for (const auto& obj : objects) {
-            if (obj.IsActive() && CheckCollisionCircleRec(potentialRight, 20.0f, obj.rect)) {
-                canMoveRight = false;
-                break;
-            }
-        }
-
-        // If we can move right, go right
-        if (canMoveRight) {
-            position = potentialRight;
-        } else {
-            // Otherwise, try moving left
-            Vector2 leftDirection = Vector2Rotate(direction, -PI / 2); // Rotate -90 degrees
-            Vector2 potentialLeft = Vector2Add(position, Vector2Scale(leftDirection, speed * deltaTime));
-
-            // Check if the left movement is clear
-            bool canMoveLeft = true;
+            // Check collisions for random direction
+            bool randomCollides = false;
             for (const auto& obj : objects) {
-                if (obj.IsActive() && CheckCollisionCircleRec(potentialLeft, 20.0f, obj.rect)) {
-                    canMoveLeft = false;
+                if (obj.IsActive() && CheckCollisionCircleRec(randomPosition, collisionRadius, obj.rect)) {
+                    randomCollides = true;
                     break;
                 }
             }
 
-            // Move left if possible
-            if (canMoveLeft) {
-                position = potentialLeft;
+            for (const auto& otherEnemy : enemies) {
+                if (&otherEnemy != this && otherEnemy.IsAlive() && Vector2Distance(randomPosition, otherEnemy.position) < collisionRadius * 2) {
+                    randomCollides = true;
+                    break;
+                }
             }
+
+            if (!randomCollides) {
+                position = randomPosition;
+                moved = true;
+                break;
+            }
+        }
+
+        if (!moved) {
+            // Log if the enemy remains stuck
+            std::cout << "Enemy stuck at position: " << position.x << ", " << position.y << std::endl;
         }
     }
 
     // Handle attack detection (e.g., collision with player)
     float distance = Vector2Distance(position, player.position);
-    float combinedRadius = (width / 2) + (player.width / 2);
-
-    std::cout << "Enemy Pos: " << position.x << ", " << position.y
-              << " | Player Pos: " << player.position.x << ", " << player.position.y
-              << " | Distance: " << distance << " | Combined Radius: " << combinedRadius << "\n";
+    float combinedRadius = collisionRadius + (player.width / 2);
 
     if (distance < combinedRadius) {
-        ::TakeDamage(player, 5); // Inflict damage on the player
-        TakeDamage(health);
-        std::cout << "Collision detected! Player HP: " << player.hp << "\n";
+        player.TakeDamage(5); // Inflict damage on the player
     }
+
+    // Debug: Log enemy position and state
+    std::cout << "Enemy Position: " << position.x << ", " << position.y << " | Collision Radius: " << collisionRadius << "\n";
 }
 
+// Handle taking damage
 void Enemy::TakeDamage(int damage) {
-    health -= damage; // Reduce health by the damage amount
-    if (health < 0) health = 0; // Prevent health from going negative
+    health -= damage;
+    if (health < 0) health = 0;
 }
 
+// Check if the enemy is alive
 bool Enemy::IsAlive() const {
-    return health > 0; // Enemy is alive if health is greater than 0
+    return health > 0;
 }
 
+// Draw the enemy
 void Enemy::Draw() const {
     if (IsAlive()) {
-        DrawCircleV(position, 20, color);
+        DrawCircleV(position, collisionRadius, color);
     }
 }
-
-

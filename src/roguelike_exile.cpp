@@ -38,71 +38,53 @@ int main() {
     camera.rotation = 0.0f;
     camera.zoom = 1.8f;
 
+    // Main game loop
     while (!WindowShouldClose()) {
-        float deltaTime = GetFrameTime();
+    float deltaTime = GetFrameTime();
 
-        // Update game state and player
-        UpdateGameState(currentScreen, isPlaying, playerDead, playerPosition, objects, enemies, player);
-        UpdatePlayerMovement(player, deltaTime, objects, camera);
+    // Update game state and player only once per frame
+    UpdateGameState(currentScreen, isPlaying, playerDead, playerPosition, objects, enemies, player);
+    UpdatePlayerMovement(player, deltaTime, objects, camera);
+    HandlePlayerInput(player, playerAttack, objects, deltaTime, camera);
+    playerAttack.Update(deltaTime, enemies, objects);
 
-        // Handle player input and shooting
-        HandlePlayerInput(player, playerAttack, objects, deltaTime, camera);
+    // Update enemies' movement and collision with player
+    for (auto it = enemies.begin(); it != enemies.end(); ) {
+        it->Update(player.position, deltaTime, objects, player, enemies);
+        if (!it->IsAlive()) {
+            it = enemies.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    
+    if (player.hp <= 0 && !playerDead) 
+    {
+        playerDead = true;
+        std::cout << "Player has died.\n";
+    }
 
-        // Update attack system (projectiles)
-        playerAttack.Update(deltaTime, enemies, objects);  // Update the projectiles
+    // Update camera
+    camera.target = player.position;
 
-        // Update camera
-        camera.target = player.position;
+    // Drawing
+    BeginDrawing();
+    ClearBackground(BLACK);
 
-        // Update enemies' movement and collision with player
-        for (auto it = enemies.begin(); it != enemies.end(); ) {
-            it->Update(player.position, deltaTime, objects, player);  // Update the enemy
+    if (currentScreen == GAMEPLAY) {
+        BeginMode2D(camera);
+        DrawGameplayScreen(objects, enemies, playerAttack, player.position, font, screenWidth, screenHeight);
+        playerAttack.Draw();
+        EndMode2D();
 
-            // Check if the enemy is alive
-            if (!it->IsAlive()) {  // Use IsAlive() to check if the enemy is dead
-                it = enemies.erase(it);  // Remove enemy from the vector and update iterator
-            } else {
-                ++it;  // Move to the next enemy if the current one is still alive
-            }
+        // UI: Display player health and position
+        DrawText(("Health: " + std::to_string(player.hp)).c_str(), 10, 10, 20, RAYWHITE);
+        DrawText(("Position: (" + std::to_string((int)player.position.x) + ", " + std::to_string((int)player.position.y) + ")").c_str(), 10, 40, 20, RAYWHITE);
+    }
+
+    EndDrawing();
 }
 
-
-        // Drawing
-        BeginDrawing();
-        ClearBackground(BLACK);
-
-        if (!playerDead && currentScreen == GAMEPLAY) {
-            UpdatePlayerMovement(player, deltaTime, objects, camera);
-                Color textColor = RAYWHITE;
-
-                std::string healthText = "Health: " + std::to_string(player.hp);
-                DrawText(healthText.c_str(), 10, 10, 20, textColor); 
-
-                std::string positionText = "Position: (" + std::to_string((int)player.position.x) + ", " + std::to_string((int)player.position.y) + ")";
-                DrawText(positionText.c_str(), 10, 40, 20, textColor); 
-
-        for (auto& enemy : enemies) {
-                enemy.Update(player.position, deltaTime, objects, player);
-        }
-
-        if (player.hp <= 0) {
-                playerDead = true;
-            }
-        }
-
-        UpdateGameState(currentScreen, isPlaying, playerDead, playerPosition, objects, enemies, player);
-
-        if (currentScreen == GAMEPLAY) {
-            BeginMode2D(camera);
-            DrawGameplayScreen(objects, enemies, playerAttack, player.position, font, screenWidth, screenHeight);
-
-            playerAttack.Draw();  // Draw the active projectiles
-
-            EndMode2D();
-        }
-
-        EndDrawing();
-    }
 
     UnloadFont(font);
     CloseWindow();

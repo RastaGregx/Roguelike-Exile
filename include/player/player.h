@@ -1,7 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "raylib.h"  // Include raylib for Vector2
+#include "raylib.h"
 
 // Define the Player struct
 struct Player {
@@ -10,12 +10,13 @@ struct Player {
     float width;
     float height;
     int hp;
+
+    // Add member function
+    void TakeDamage(int damage);
 };
 
-// Function declarations
+// Function declaration for initialization
 void InitPlayer(Player &player, float x, float y, float speed, float width, float height, int hp);
-void TakeDamage(Player &player, int damage);
-
-
+void DrawPlayer(const Player &player);
 
 #endif // PLAYER_H

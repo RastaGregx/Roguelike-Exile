@@ -6,8 +6,8 @@
 
 // Update enemies' state based on the player position
 void UpdateEnemies(std::vector<Enemy>& enemies, Vector2 playerPosition, float deltaTime, std::vector<Object>& objects, Player& player) {
-    for (auto& enemy : enemies) {
-        enemy.Update(playerPosition, deltaTime, objects, player);  // Now you can access the player object
+    for (size_t i = 0; i < enemies.size(); ++i) {
+        enemies[i].Update(playerPosition, deltaTime, objects, player, enemies);
     }
 }
 

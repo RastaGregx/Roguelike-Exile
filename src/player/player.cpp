@@ -9,9 +9,9 @@ void InitPlayer(Player &player, float x, float y, float speed, float width, floa
     player.hp = hp;
 }
 
-void TakeDamage(Player &player, int damage) {
-    player.hp -= damage;
-    if (player.hp < 0) player.hp = 0;
+void Player::TakeDamage(int damage) {
+    hp -= damage;
+    if (hp < 0) hp = 0;
 }
 
 void DrawPlayer(const Player &player) {

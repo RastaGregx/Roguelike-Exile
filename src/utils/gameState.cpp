@@ -37,8 +37,18 @@ void HandleTitleState(GameScreen& currentScreen, bool& isPlaying, bool& playerDe
         isPlaying = true;
         playerDead = false;
         playerPosition = { 1280, 670 }; // Reset player position
-        enemies.push_back(Enemy(Vector2{ 1000, 800 }, 100.0f, RED, 50)); // Example enemy
-        enemies.push_back(MeleeEnemy(Vector2{ 900, 800 }, 50.0f, 100)); // Example derived enemy
+        enemies.clear();
+        objects.clear();
+
+        int level = 5; // Example: Current level, you can increment this dynamically
+
+        // Spawn enemies with stats based on level
+        enemies.push_back(Enemy::CreateEnemy(Vector2{ 1000, 800 }, level));
+        enemies.push_back(Enemy::CreateEnemy(Vector2{ 900, 800 }, level));
+        enemies.push_back(Enemy::CreateEnemy(Vector2{ 700, 800 }, level));
+        enemies.push_back(Enemy::CreateEnemy(Vector2{ 600, 800 }, level));
+        enemies.push_back(Enemy::CreateEnemy(Vector2{ 500, 800 }, level));
+        // Example objects
         objects.push_back(Object(500, 500, 200, 20)); // Example object
     }
 }
