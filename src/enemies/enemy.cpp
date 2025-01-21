@@ -69,7 +69,7 @@ void Enemy::Update(Vector2 playerPosition, float deltaTime, const std::vector<Ob
         }
     }
 
-    // Continue to handle the player's attack and other behaviors like before
+    // Handle attack detection (e.g., collision with player)
     float distance = Vector2Distance(position, player.position);
     float combinedRadius = (width / 2) + (player.width / 2);
 
@@ -78,17 +78,16 @@ void Enemy::Update(Vector2 playerPosition, float deltaTime, const std::vector<Ob
               << " | Distance: " << distance << " | Combined Radius: " << combinedRadius << "\n";
 
     if (distance < combinedRadius) {
-        ::TakeDamage(player, 10);
+        ::TakeDamage(player, 5); // Inflict damage on the player
+        TakeDamage(health);
         std::cout << "Collision detected! Player HP: " << player.hp << "\n";
     }
 }
-
 
 void Enemy::TakeDamage(int damage) {
     health -= damage; // Reduce health by the damage amount
     if (health < 0) health = 0; // Prevent health from going negative
 }
-
 
 bool Enemy::IsAlive() const {
     return health > 0; // Enemy is alive if health is greater than 0
@@ -99,3 +98,5 @@ void Enemy::Draw() const {
         DrawCircleV(position, 20, color);
     }
 }
+
+

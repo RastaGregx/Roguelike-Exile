@@ -1,12 +1,12 @@
 #include "utils/GameState.h"
 #include "objects/object.h"
 #include "enemies/enemy.h"
+#include "enemies/meleeEnemy.h"
 #include "player/player.h"
 #include "raylib.h"
 #include <vector>
 
 void InitGameState(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, Vector2& playerPosition, std::vector<Object>& objects, std::vector<Enemy>& enemies) {
-    // Initialize default values
     currentScreen = TITLE;
     isPlaying = false;
     playerDead = false;
@@ -38,6 +38,7 @@ void HandleTitleState(GameScreen& currentScreen, bool& isPlaying, bool& playerDe
         playerDead = false;
         playerPosition = { 1280, 670 }; // Reset player position
         enemies.push_back(Enemy(Vector2{ 1000, 800 }, 100.0f, RED, 50)); // Example enemy
+        enemies.push_back(MeleeEnemy(Vector2{ 900, 800 }, 50.0f, 100)); // Example derived enemy
         objects.push_back(Object(500, 500, 200, 20)); // Example object
     }
 }
@@ -50,8 +51,6 @@ void HandleGameOverState(GameScreen& currentScreen, bool& isPlaying, bool& playe
         playerPosition = { 1280, 670 }; // Reset player position
         objects.clear();        // Clear objects
         enemies.clear();        // Clear enemies
-
-        // Reset player's HP
         InitPlayer(player, playerPosition.x, playerPosition.y, 300.0f, 45.0f, 45.0f, 50); // Reinitialize player
     }
 }

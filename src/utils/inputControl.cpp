@@ -21,7 +21,7 @@ void HandlePlayerInput(Player& player, Attack& playerAttack, std::vector<Object>
 
     // Only allow shooting if the cooldown is over
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && canShoot) {
-        HandleShooting(player.position, playerAttack, direction);
+        playerAttack.Shoot(player.position, direction); // Use Attack's Shoot method
         canShoot = false;  // Prevent additional shooting in the same frame
     }
 
@@ -29,14 +29,4 @@ void HandlePlayerInput(Player& player, Attack& playerAttack, std::vector<Object>
     if (!canShoot) {
         canShoot = true;
     }
-}
-
-
-void HandleShooting(Vector2& playerPosition, Attack& playerAttack, Vector2 direction) {
-    float speed = 500.0f; 
-    Vector2 velocity = Vector2Scale(direction, speed); 
-
-    std::cout << "Projectile velocity: " << velocity.x << ", " << velocity.y << std::endl;
-
-    playerAttack.Shoot(playerPosition, velocity, 10.0f, BLUE);
 }

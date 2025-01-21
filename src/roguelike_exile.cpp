@@ -69,18 +69,24 @@ int main() {
 
         // Drawing
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        ClearBackground(BLACK);
 
         if (!playerDead && currentScreen == GAMEPLAY) {
             UpdatePlayerMovement(player, deltaTime, objects, camera);
-            //HandlePlayerInput(player, playerAttack, objects, deltaTime, camera);
+                Color textColor = RAYWHITE;
+
+                std::string healthText = "Health: " + std::to_string(player.hp);
+                DrawText(healthText.c_str(), 10, 10, 20, textColor); 
+
+                std::string positionText = "Position: (" + std::to_string((int)player.position.x) + ", " + std::to_string((int)player.position.y) + ")";
+                DrawText(positionText.c_str(), 10, 40, 20, textColor); 
 
         for (auto& enemy : enemies) {
                 enemy.Update(player.position, deltaTime, objects, player);
         }
 
         if (player.hp <= 0) {
-                playerDead = true;  // Mark the player as dead
+                playerDead = true;
             }
         }
 
@@ -90,7 +96,6 @@ int main() {
             BeginMode2D(camera);
             DrawGameplayScreen(objects, enemies, playerAttack, player.position, font, screenWidth, screenHeight);
 
-            // Draw projectiles (after updating)
             playerAttack.Draw();  // Draw the active projectiles
 
             EndMode2D();

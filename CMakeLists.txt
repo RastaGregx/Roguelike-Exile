@@ -33,6 +33,7 @@ set(SOURCES
     src/player/attack.cpp
 
     src/enemies/enemy.cpp
+    src/enemies/meleeEnemy.cpp
     src/enemies/enemyManager.cpp
 
     src/objects/objectManager.cpp
@@ -41,8 +42,6 @@ set(SOURCES
     src/utils/gameState.cpp
     src/utils/inputControl.cpp
     src/utils/drawingUI.cpp
-
-    src/map.cpp
 )
 
 set(HEADERS
@@ -51,6 +50,7 @@ set(HEADERS
     include/player/attack.h
 
     include/enemies/enemy.h
+    include/enemies/meleenemy.h
     include/enemies/enemyManager.h
 
     include/objects/objectManager.h
