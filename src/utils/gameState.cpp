@@ -1,7 +1,6 @@
 #include "utils/GameState.h"
 #include "objects/object.h"
 #include "enemies/enemy.h"
-#include "enemies/meleeEnemy.h"
 #include "player/player.h"
 #include "raylib.h"
 #include <vector>
@@ -10,9 +9,8 @@ void InitGameState(GameScreen& currentScreen, bool& isPlaying, bool& playerDead,
     currentScreen = TITLE;
     isPlaying = false;
     playerDead = false;
-    playerPosition = { 1280, 670 }; // Center of screen by default
+    playerPosition = { 1280, 670 };
 
-    // Clear enemies and objects at start
     enemies.clear();
     objects.clear();
 }
@@ -36,31 +34,30 @@ void HandleTitleState(GameScreen& currentScreen, bool& isPlaying, bool& playerDe
         currentScreen = GAMEPLAY;
         isPlaying = true;
         playerDead = false;
-        playerPosition = { 1280, 670 }; // Reset player position
+        playerPosition = { 1280, 670 };
         enemies.clear();
         objects.clear();
 
-        int level = 5; // Example: Current level, you can increment this dynamically
+        int level = 5;
 
-        // Spawn enemies with stats based on level
         enemies.push_back(Enemy::CreateEnemy(Vector2{ 1000, 800 }, level));
         enemies.push_back(Enemy::CreateEnemy(Vector2{ 900, 800 }, level));
         enemies.push_back(Enemy::CreateEnemy(Vector2{ 700, 800 }, level));
         enemies.push_back(Enemy::CreateEnemy(Vector2{ 600, 800 }, level));
         enemies.push_back(Enemy::CreateEnemy(Vector2{ 500, 800 }, level));
-        // Example objects
-        objects.push_back(Object(500, 500, 200, 20)); // Example object
+
+        objects.push_back(Object(500, 500, 200, 20));
     }
 }
 
 void HandleGameOverState(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, Player& player, Vector2& playerPosition, std::vector<Object>& objects, std::vector<Enemy>& enemies) {
     if (IsKeyPressed(KEY_ENTER)) {
-        currentScreen = TITLE;  // Transition to title screen
-        isPlaying = false;      // Stop gameplay logic
-        playerDead = false;     // Reset the player death state
-        playerPosition = { 1280, 670 }; // Reset player position
-        objects.clear();        // Clear objects
-        enemies.clear();        // Clear enemies
-        InitPlayer(player, playerPosition.x, playerPosition.y, 300.0f, 45.0f, 45.0f, 50); // Reinitialize player
+        currentScreen = TITLE;
+        isPlaying = false;
+        playerDead = false;
+        playerPosition = { 1280, 670 }; 
+        objects.clear();
+        enemies.clear();
+        InitPlayer(player, playerPosition.x, playerPosition.y, 300.0f, 45.0f, 45.0f, 50);
     }
 }

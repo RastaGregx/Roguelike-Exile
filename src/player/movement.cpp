@@ -5,7 +5,6 @@
 #include <vector>
 
 void UpdatePlayerMovement(Player &player, float deltaTime, const std::vector<Object>& objects, Camera2D &camera) {
-    // Process movement
     Vector2 proposedPosition = player.position;
 
     if (IsKeyDown(KEY_W)) proposedPosition.y -= player.speed * deltaTime;
@@ -18,29 +17,26 @@ void UpdatePlayerMovement(Player &player, float deltaTime, const std::vector<Obj
     for (const auto& obj : objects) {
         if (obj.CheckCollision(newPlayerRectX)) {
             if (proposedPosition.x < obj.rect.x) {
-                proposedPosition.x = obj.rect.x - player.width;  // Flush to the left
+                proposedPosition.x = obj.rect.x - player.width;
             } else if (proposedPosition.x > obj.rect.x) {
-                proposedPosition.x = obj.rect.x + obj.rect.width;  // Flush to the right
+                proposedPosition.x = obj.rect.x + obj.rect.width;
             }
         }
     }
 
-    // Resolve collision along Y axis
     Rectangle newPlayerRectY = {proposedPosition.x, proposedPosition.y, player.width, player.height};
     for (const auto& obj : objects) {
         if (obj.CheckCollision(newPlayerRectY)) {
             if (proposedPosition.y < obj.rect.y) {
-                proposedPosition.y = obj.rect.y - player.height;  // Flush above
+                proposedPosition.y = obj.rect.y - player.height;
             } else if (proposedPosition.y > obj.rect.y) {
-                proposedPosition.y = obj.rect.y + obj.rect.height;  // Flush below
+                proposedPosition.y = obj.rect.y + obj.rect.height;
             }
         }
     }
 
-    // Update player position
     player.position = proposedPosition;
 
-    // Keep the player within the screen boundaries
     const int screenWidth = GetScreenWidth();
     const int screenHeight = GetScreenHeight();
 
@@ -49,6 +45,5 @@ void UpdatePlayerMovement(Player &player, float deltaTime, const std::vector<Obj
     if (player.position.y < 0) player.position.y = 0;
     if (player.position.y + player.height > screenHeight) player.position.y = screenHeight - player.height;
 
-    // Update camera to follow the player
     camera.target = (Vector2){ player.position.x + player.width / 2.0f, player.position.y + player.height / 2.0f };
 }

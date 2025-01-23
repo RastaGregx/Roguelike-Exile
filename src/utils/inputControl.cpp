@@ -5,12 +5,12 @@
 #include <iostream>
 
 void HandlePlayerInput(Player& player, Attack& playerAttack, std::vector<Object>& objects, float deltaTime, Camera2D& camera) {
-    static bool canShoot = true;  // Flag to control shooting cooldown
+    static bool canShoot = true;
+    float shootCooldown = 0.2f;
+    static float shootTimer = 0.0f;
 
-    // Update player movement (pass entire player object)
     UpdatePlayerMovement(player, deltaTime, objects, camera);
 
-    // Handle mouse input for attacking
     Vector2 mousePosition = GetMousePosition();
     Vector2 worldMousePosition = GetScreenToWorld2D(mousePosition, camera);
     Vector2 direction = Vector2Subtract(worldMousePosition, player.position);
@@ -19,14 +19,17 @@ void HandlePlayerInput(Player& player, Attack& playerAttack, std::vector<Object>
         direction = Vector2Normalize(direction);
     }
 
-    // Only allow shooting if the cooldown is over
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && canShoot) {
-        playerAttack.Shoot(player.position, direction); // Use Attack's Shoot method
-        canShoot = false;  // Prevent additional shooting in the same frame
+    if (!canShoot) {
+        shootTimer += GetFrameTime(); 
+    if (shootTimer >= shootCooldown) {
+        canShoot = true;
+        shootTimer = 0.0f;
+    }
     }
 
-    // Reset the cooldown after a small delay
-    if (!canShoot) {
-        canShoot = true;
+    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && canShoot) {
+        playerAttack.Shoot(player.position, direction);
+        canShoot = false;
     }
+
 }

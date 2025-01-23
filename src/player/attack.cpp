@@ -11,7 +11,7 @@ bool CheckCollision(const Rectangle& rect1, const Rectangle& rect2) {
 
 void Attack::Shoot(Vector2 position, Vector2 direction) {
     if (Vector2Length(direction) > 0) {
-        direction = Vector2Normalize(direction); // Normalize the direction
+        direction = Vector2Normalize(direction);
     }
 
     float speed = 500.0f; 
@@ -29,7 +29,6 @@ void Attack::Update(float deltaTime, std::vector<Enemy>& enemies, const std::vec
         proj.position.x += proj.velocity.x * deltaTime;
         proj.position.y += proj.velocity.y * deltaTime;
 
-        // Collision with objects
         for (const auto& obj : objects) {
             if (CheckCollision({ proj.position.x - proj.radius, proj.position.y - proj.radius, proj.radius * 2, proj.radius * 2 }, obj.rect)) {
                 proj.active = false;
@@ -37,7 +36,6 @@ void Attack::Update(float deltaTime, std::vector<Enemy>& enemies, const std::vec
             }
         }
 
-        // Collision with enemies
         for (auto& enemy : enemies) {
             if (proj.active && enemy.IsAlive() &&
                 CheckCollisionCircles(proj.position, proj.radius, enemy.position, 20.0f)) {
