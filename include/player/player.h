@@ -9,10 +9,14 @@ struct Player {
     float width;
     float height;
     int hp;
+    float collisionRadius;  // Added for collision detection
     Texture2D texture;
 
     void TakeDamage(int damage);
+    Vector2 GetPosition() const;
+    float GetCollisionRadius() const;
 };
+
 
 void InitPlayer(Player &player, float x, float y, float speed, float width, float height, int hp, const char* spritePath);
 void DrawPlayer(const Player &player);

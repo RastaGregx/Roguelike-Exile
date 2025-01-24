@@ -11,6 +11,5 @@
 
 // Handle player movement input and attack
 void HandlePlayerInput(Player& player, Attack& playerAttack, std::vector<Object>& objects, float deltaTime, Camera2D& camera);
-void HandleShooting(Vector2& playerPosition, Attack& playerAttack, Vector2 direction);
 
 #endif

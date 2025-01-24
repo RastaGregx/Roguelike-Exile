@@ -8,11 +8,20 @@ void InitPlayer(Player &player, float x, float y, float speed, float width, floa
     player.height = height;
     player.hp = hp;
     player.texture = LoadTexture(spritePath); 
+    player.collisionRadius = width / 2;  // Assuming the collision radius is based on the player's width
 }
 
 void Player::TakeDamage(int damage) {
-    hp += damage;
-    if (hp < 0) hp = 0;
+    hp -= damage;  // Subtract damage instead of adding
+    if (hp < 0) hp = 0;  // Prevent health from going negative
+}
+
+Vector2 Player::GetPosition() const {
+    return position;
+}
+
+float Player::GetCollisionRadius() const {
+    return collisionRadius;
 }
 
 void DrawPlayer(const Player &player) {

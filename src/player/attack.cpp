@@ -36,14 +36,14 @@ void Attack::Update(float deltaTime, std::vector<std::shared_ptr<Enemy>> enemies
             }
         }
 
-        // for (auto& enemy : enemies) {
-        //     if (proj.active && enemy.IsAlive() &&
-        //         CheckCollisionCircles(proj.position, proj.radius, enemy.position, 20.0f)) {
-        //         enemy.TakeDamage(10);
-        //         proj.active = false;
-        //         break;
-        //     }
-        // }
+        for (auto& enemy : enemies) {
+            if (proj.active && enemy->IsAlive() &&
+                CheckCollisionCircles(proj.position, proj.radius, enemy->GetPosition(), 20.0f)) {
+                enemy->TakeDamage(10);
+                proj.active = false;
+                break;
+            }
+        }
     }
 
     projectiles.erase(

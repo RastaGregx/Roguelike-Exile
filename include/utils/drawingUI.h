@@ -9,7 +9,7 @@
 #include <vector>
 
 void DrawTitleScreen(Font font, int screenWidth, int screenHeight);
-void DrawGameplayScreen(const std::vector<Object>& objects, std::vector<std::shared_ptr<Enemy>> enemies, const Attack& playerAttack, Vector2 playerPosition, Font font, int screenWidth, int screenHeight, const Player& player);
+void DrawGameplayScreen(const std::vector<Object>& objects, const Attack& playerAttack, Vector2 playerPosition, Font font, int screenWidth, int screenHeight, const Player& player);
 void DrawGameOverScreen(Font font, int screenWidth, int screenHeight);
 
 #endif

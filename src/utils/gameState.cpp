@@ -1,35 +1,39 @@
 #include "utils/GameState.h"
 #include "objects/object.h"
 #include "enemies/enemy.h"
+#include "enemies/enemyManager.h"
+#include "enemies/tank.h"
 #include "player/player.h"
 #include "raylib.h"
+#include "nlohmann/json.hpp"
+#include <fstream>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
-void InitGameState(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, Vector2& playerPosition, std::vector<Object>& objects, std::vector<std::shared_ptr<Enemy>>& enemies) {
+void InitGameState(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, Vector2& playerPosition, std::vector<Object>& objects, EnemyManager& enemyManager) {
     currentScreen = TITLE;
     isPlaying = false;
     playerDead = false;
     playerPosition = { 100, 100 };
 
-    enemies.clear();
     objects.clear();
+    enemyManager.ClearEnemies(); 
 }
 
-void UpdateGameState(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, Vector2& playerPosition, std::vector<Object>& objects, std::vector<std::shared_ptr<Enemy>>& enemies, Player& player, Camera2D& camera) {
+void UpdateGameState(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, Vector2& playerPosition, std::vector<Object>& objects, EnemyManager& enemyManager, Player& player, Camera2D& camera) {
     if (playerDead && currentScreen != GAMEOVER) {
         currentScreen = GAMEOVER;
         isPlaying = false;
         return;
     }
 
-    for (auto& enemy : enemies) {
-        // Pass the actual player world position, not screen position
-        enemy->Update(player.position, GetFrameTime(), objects, player, enemies);
-    }
+
+    enemyManager.UpdateEnemies(player.position, GetFrameTime(), objects, player);
+    enemyManager.RemoveDeadEnemies();
 }
 
-void HandleStates(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, Player& player, Vector2& playerPosition, std::vector<Object>& objects, std::vector<std::shared_ptr<Enemy>>& enemies, Camera2D& camera) {
+void HandleStates(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, Player& player, Vector2& playerPosition, std::vector<Object>& objects, EnemyManager& enemyManager, Camera2D& camera) {
     if (currentScreen == TITLE) {
         if (IsKeyPressed(KEY_ENTER)) {
             currentScreen = GAMEPLAY;
@@ -37,12 +41,42 @@ void HandleStates(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, 
             playerDead = false;
             playerPosition = { 0, 0 };
             objects.clear();
-            enemies.clear();
 
-            InitPlayer(player, playerPosition.x, playerPosition.y, 300.0f, 16.0f, 16.0f, 50, "../assets/sprites/wisp.png");
-            
-            Vector2 enemyPosition = { 400, 400 };
-            enemies.push_back(std::make_shared<Enemy>(enemyPosition, 100.0f, RED, 10));
+            enemyManager.ClearEnemies();
+
+            InitPlayer(player, playerPosition.x, playerPosition.y, 300.0f, 16.0f, 16.0f, 50, "build/assets_copy/assets/sprites/wisp.png");
+
+            // Load enemy stats from JSON
+            std::ifstream file("build/assets_copy/assets/enemy_stats.json");
+            if (!file.is_open()) {
+                std::cerr << "Failed to open enemy_stats.json" << std::endl;
+                return;
+            }
+
+            nlohmann::json enemyStats;
+            try {
+                file >> enemyStats;
+            } catch (const nlohmann::json::parse_error& e) {
+                std::cerr << "JSON parse error: " << e.what() << std::endl;
+                return;
+            }
+
+            for (const auto& enemyData : enemyStats["enemies"]) {
+                Vector2 position = { enemyData["position"]["x"], enemyData["position"]["y"] };
+                float speed = enemyData["speed"];
+                Color color = GREEN; // Assuming color is predefined
+                int health = enemyData["health"];
+                float attackCooldown = enemyData["attackCooldown"];
+
+                std::shared_ptr<Enemy> enemy;
+                if (enemyData["type"] == "Tank") {
+                    enemy = std::make_shared<Tank>(position, speed, color, health, attackCooldown);
+                }
+                // Add more enemy types as needed
+
+                enemyManager.AddEnemy(enemy);
+            }
+
             objects.push_back(Object(500, 500, 200, 20));
             objects.push_back(Object(500, 500, 20, 200));
         }
@@ -51,15 +85,25 @@ void HandleStates(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, 
             currentScreen = TITLE;
             isPlaying = false;
             playerDead = false;
-            playerPosition = { 100, 100 }; 
+            playerPosition = { 100, 100 };
             objects.clear();
-            enemies.clear();
-            InitPlayer(player, playerPosition.x, playerPosition.y, 300.0f, 45.0f, 45.0f, 50, "../assets/sprites/wisp.png");
+            enemyManager.ClearEnemies();
+            InitPlayer(player, playerPosition.x, playerPosition.y, 300.0f, 45.0f, 45.0f, 50, "build/assets_copy/assets/sprites/wisp.png");
         }
     }
-    for (auto& enemy : enemies) {
-        // Convert enemy world position to screen position for drawing
+
+    // Drawing all the enemies using EnemyManager
+    for (const auto& enemy : enemyManager.GetEnemies()) {
         Vector2 enemyScreenPos = GetWorldToScreen2D(enemy->GetPosition(), camera);
-        DrawCircleV(enemyScreenPos, 10, RED); // Example drawing
+        Color enemyColor = BLUE; // Default color for normal enemies
+        float enemySize = 10.0f; // Default size for normal enemies
+
+        // Check if the enemy is a Tank and set the color and size
+        if (std::dynamic_pointer_cast<Tank>(enemy)) {
+            enemyColor = GREEN;
+            enemySize = 20.0f; // Larger size for tanks
+        }
+
+        DrawCircleV(enemyScreenPos, enemySize, enemyColor); // Draw enemy with the appropriate color and size
     }
 }

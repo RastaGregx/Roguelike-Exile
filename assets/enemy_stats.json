@@ -1,0 +1,20 @@
+{
+    "enemies": [
+        {
+            "type": "Tank",
+            "position": { "x": 400, "y": 400 },
+            "speed": 30.0,
+            "color": "GREEN",
+            "health": 100,
+            "attackCooldown": 5.0
+        },
+        {
+            "type": "Tank",
+            "position": { "x": 500, "y": 500 },
+            "speed": 25.0,
+            "color": "GREEN",
+            "health": 120,
+            "attackCooldown": 6.0
+        }
+    ]
+}

@@ -4,7 +4,9 @@
 #include "player/movement.h"
 #include "player/attack.h"
 
+#include "enemies/enemyManager.h"
 #include "enemies/enemy.h"
+#include "enemies/tank.h"
 
 #include "objects/object.h"
 
@@ -23,12 +25,12 @@ int main() {
 
     InitWindow(screenWidth, screenHeight, "Roguelike Exile");
     SetTargetFPS(60);
-    Image icon = LoadImage("../assets/sprites/wisp.png");
+    Image icon = LoadImage("build/assets_copy/assets/sprites/wisp.png");
     SetWindowIcon(icon);
     UnloadImage(icon);
 
     Font font = LoadFont("resources/fonts/modern.ttf");
-    Texture2D sprite = LoadTexture("../assets/sprites/ground.png");
+    Texture2D sprite = LoadTexture("build/assets_copy/assets/sprites/wisp.png");
 
     GameScreen currentScreen;
 
@@ -36,8 +38,9 @@ int main() {
     Player player;
     Attack playerAttack;
 
+    EnemyManager enemyManager;
+
     std::vector<Object> objects;
-    std::vector<std::shared_ptr<Enemy>> enemies;
     Camera2D camera = { 100, 100 };
 
 
@@ -46,13 +49,14 @@ int main() {
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
 
-    InitGameState(currentScreen, isPlaying, playerDead, player.position, objects, enemies);
+    InitGameState(currentScreen, isPlaying, playerDead, player.position, objects, enemyManager);
+
 
 while (!WindowShouldClose()) {
     float deltaTime = GetFrameTime();
 
-    HandleStates(currentScreen, isPlaying, playerDead, player, player.position, objects, enemies, camera);
-    UpdateGameState(currentScreen, isPlaying, playerDead, player.position, objects, enemies, player, camera);
+    HandleStates(currentScreen, isPlaying, playerDead, player, player.position, objects, enemyManager, camera);
+    UpdateGameState(currentScreen, isPlaying, playerDead, player.position, objects, enemyManager, player, camera);
 
     BeginDrawing();
     ClearBackground(BLACK);
@@ -61,15 +65,14 @@ while (!WindowShouldClose()) {
         case TITLE:
             DrawTitleScreen(font, screenWidth, screenHeight);
             break;
-        case GAMEPLAY:
-            // Your existing gameplay rendering logic
+        case GAMEPLAY: 
             UpdatePlayerMovement(player, deltaTime, objects, camera);
             HandlePlayerInput(player, playerAttack, objects, deltaTime, camera);
-            playerAttack.Update(deltaTime, enemies, objects);
 
             BeginMode2D(camera);
-            DrawGameplayScreen(objects, enemies, playerAttack, player.position, font, screenWidth, screenHeight, player);
+            DrawGameplayScreen(objects, playerAttack, player.position, font, screenWidth, screenHeight, player);
             playerAttack.Draw();
+            playerAttack.Update(deltaTime, enemyManager.GetEnemies(), objects);
             EndMode2D();
             
             DrawText(("Health: " + std::to_string(player.hp)).c_str(), 10, 10, 20, RAYWHITE);

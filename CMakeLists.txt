@@ -24,6 +24,14 @@ FetchContent_Declare(
 set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(raylib)
 
+# Fetch nlohmann JSON library using FetchContent
+FetchContent_Declare(
+    nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.11.2  # You can adjust the version as needed
+)
+FetchContent_MakeAvailable(nlohmann_json)
+
 # Source and header files
 set(SOURCES
     src/roguelike_exile.cpp
@@ -34,6 +42,7 @@ set(SOURCES
 
     src/enemies/enemy.cpp
     src/enemies/enemyManager.cpp
+    src/enemies/tank.cpp
 
     src/objects/objectManager.cpp
 
@@ -50,6 +59,7 @@ set(HEADERS
 
     include/enemies/enemy.h
     include/enemies/enemyManager.h
+    include/enemies/tank.h
 
     include/objects/objectManager.h
     include/objects/object.h
@@ -62,16 +72,31 @@ set(HEADERS
     include/map.h
 )
 
+# Asset directory setup
+set(ASSET_DIR "assets")
+set(OUTPUT_ASSET_DIR "${CMAKE_BINARY_DIR}/assets_copy")
+
+# Ensure the output directory exists and is a directory, not a file
+if(EXISTS ${OUTPUT_ASSET_DIR} AND NOT IS_DIRECTORY ${OUTPUT_ASSET_DIR})
+    message(FATAL_ERROR "The path ${OUTPUT_ASSET_DIR} exists as a file, not a directory!")
+elseif(NOT EXISTS ${OUTPUT_ASSET_DIR})
+    file(MAKE_DIRECTORY ${OUTPUT_ASSET_DIR})
+endif()
+
+# Copy assets to the build output directory (including subdirectories)
+file(COPY ${ASSET_DIR} DESTINATION ${OUTPUT_ASSET_DIR})
+
 # Add the executable
 add_executable(Roguelike-Exile ${SOURCES})
 
 # Include directories (Make sure to include the Raylib headers)
 target_include_directories(Roguelike-Exile PRIVATE include ${raylib_INCLUDE_DIRS})
-#include_directories(${CMAKE_SOURCE_DIR}/include)
-
 
 # Link Raylib
 target_link_libraries(Roguelike-Exile PRIVATE raylib)
+
+# Link nlohmann JSON library (if required, it's header-only)
+target_link_libraries(Roguelike-Exile PRIVATE nlohmann_json::nlohmann_json)
 
 # Set C++ standard
 set_property(TARGET Roguelike-Exile PROPERTY CXX_STANDARD 17)
