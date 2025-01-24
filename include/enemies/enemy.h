@@ -12,7 +12,7 @@ public:
     Enemy(Vector2 pos, float spd, Color col, int hp);
 
     virtual void Update(Vector2 playerPosition, float deltaTime, const std::vector<Object>& objects, Player& player, std::vector<std::shared_ptr<Enemy>>& enemies);
-    void Draw() const;
+    virtual void Draw() const;
     virtual void TakeDamage(int damage);
     bool IsAlive() const;
     Vector2 GetPosition() const;

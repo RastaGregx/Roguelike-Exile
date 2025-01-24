@@ -64,13 +64,16 @@ void HandleStates(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, 
             for (const auto& enemyData : enemyStats["enemies"]) {
                 Vector2 position = { enemyData["position"]["x"], enemyData["position"]["y"] };
                 float speed = enemyData["speed"];
-                Color color = GREEN; // Assuming color is predefined
+                Color color = GREEN; 
                 int health = enemyData["health"];
                 float attackCooldown = enemyData["attackCooldown"];
+                std::string texturePath = enemyData["texturePath"];  
 
+                // Create enemy based on type
                 std::shared_ptr<Enemy> enemy;
                 if (enemyData["type"] == "Tank") {
-                    enemy = std::make_shared<Tank>(position, speed, color, health, attackCooldown);
+                    // Pass the texture path to the Tank constructor
+                    enemy = std::make_shared<Tank>(position, speed, color, health, attackCooldown, texturePath);
                 }
                 // Add more enemy types as needed
 
@@ -95,15 +98,21 @@ void HandleStates(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, 
     // Drawing all the enemies using EnemyManager
     for (const auto& enemy : enemyManager.GetEnemies()) {
         Vector2 enemyScreenPos = GetWorldToScreen2D(enemy->GetPosition(), camera);
-        Color enemyColor = BLUE; // Default color for normal enemies
-        float enemySize = 10.0f; // Default size for normal enemies
+        Color enemyColor = BLUE; 
+        float enemySize = 10.0f; 
 
         // Check if the enemy is a Tank and set the color and size
-        if (std::dynamic_pointer_cast<Tank>(enemy)) {
+        if (std::shared_ptr<Tank> tank = std::dynamic_pointer_cast<Tank>(enemy)) {
             enemyColor = GREEN;
             enemySize = 20.0f; // Larger size for tanks
+            if (tank->hasTexture()) {
+                DrawTextureEx(tank->getTexture(),enemyScreenPos, 0.0f, 2.0f, WHITE);
+            } else {
+                DrawCircleV(enemyScreenPos, enemySize, enemyColor);
+            }
+        } else {
+            DrawCircleV(enemyScreenPos, enemySize, enemyColor);
         }
-
-        DrawCircleV(enemyScreenPos, enemySize, enemyColor); // Draw enemy with the appropriate color and size
     }
 }
+

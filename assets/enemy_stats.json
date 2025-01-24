@@ -1,20 +1,23 @@
 {
     "enemies": [
-        {
-            "type": "Tank",
-            "position": { "x": 400, "y": 400 },
-            "speed": 30.0,
-            "color": "GREEN",
-            "health": 100,
-            "attackCooldown": 5.0
-        },
-        {
-            "type": "Tank",
-            "position": { "x": 500, "y": 500 },
-            "speed": 25.0,
-            "color": "GREEN",
-            "health": 120,
-            "attackCooldown": 6.0
-        }
+      {
+        "type": "Tank",
+        "position": { "x": 100, "y": 200 },
+        "speed": 2.5,
+        "color": "green", 
+        "health": 100,
+        "attackCooldown": 1.5,
+        "texturePath": "build/assets_copy/assets/sprites/slime_red.png"
+      },
+      {
+        "type": "Tank",
+        "position": { "x": 200, "y": 300 },
+        "speed": 3.0,
+        "color": "blue",
+        "health": 120,
+        "attackCooldown": 2.0,
+        "texturePath": "build/assets_copy/assets/sprites/slime_red.png"
+      }
     ]
-}
+  }
+  
