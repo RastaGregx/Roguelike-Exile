@@ -33,7 +33,6 @@ set(SOURCES
     src/player/attack.cpp
 
     src/enemies/enemy.cpp
-    src/enemies/fastEnemy.cpp
     src/enemies/enemyManager.cpp
 
     src/objects/objectManager.cpp
@@ -50,7 +49,6 @@ set(HEADERS
     include/player/attack.h
 
     include/enemies/enemy.h
-    include/enemies/fastnemy.h
     include/enemies/enemyManager.h
 
     include/objects/objectManager.h

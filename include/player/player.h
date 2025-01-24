@@ -9,11 +9,12 @@ struct Player {
     float width;
     float height;
     int hp;
+    Texture2D texture;
 
     void TakeDamage(int damage);
 };
 
-void InitPlayer(Player &player, float x, float y, float speed, float width, float height, int hp);
+void InitPlayer(Player &player, float x, float y, float speed, float width, float height, int hp, const char* spritePath);
 void DrawPlayer(const Player &player);
 
 #endif

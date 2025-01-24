@@ -1,4 +1,5 @@
 #include "utils/DrawingUI.h"
+#include "player/player.h"
 #include "raylib.h"
 
 void DrawTitleScreen(Font font, int screenWidth, int screenHeight) {
@@ -10,17 +11,15 @@ void DrawTitleScreen(Font font, int screenWidth, int screenHeight) {
                20.0f, 2.0f, DARKGRAY);
 }
 
-void DrawGameplayScreen(const std::vector<Object>& objects, const std::vector<Enemy>& enemies, const Attack& playerAttack, Vector2 playerPosition, Font font, int screenWidth, int screenHeight) {
-    DrawRectangleV(playerPosition, { 50.0f, 50.0f }, BLUE);
+void DrawGameplayScreen(const std::vector<Object>& objects, std::vector<std::shared_ptr<Enemy>> enemies, const Attack& playerAttack, Vector2 playerPosition, Font font, int screenWidth, int screenHeight, const Player& player) {
+    DrawRectangleV(playerPosition, { 16.0f, 16.0f }, BLUE);
+    DrawTexture(player.texture, player.position.x , player.position.y , WHITE);
     playerAttack.Draw();
 
     for (const auto& obj : objects) {
-        DrawRectangleRec(obj.rect, GREEN);
+        DrawRectangleRec(obj.rect, RED);
     }
 
-    for (const auto& enemy : enemies) {
-        enemy.Draw();
-    }
 }
 
 void DrawGameOverScreen(Font font, int screenWidth, int screenHeight) {

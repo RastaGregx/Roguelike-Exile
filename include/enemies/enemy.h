@@ -3,40 +3,37 @@
 
 #include "raylib.h"
 #include "player/player.h"
-#include "objects/object.h"
+#include "objects/object.h" // Assuming Object is defined here
 #include <vector>
-#include <cmath>
+#include <memory>
 
 class Enemy {
+protected:
+    int health;
+
+    Color color;
+    float speed;
+    float width;
+    float attackCooldown;
+    float lastAttackTime;
+    float pushbackStrength;
+    float collisionRadius;
+
 public:
-    Vector2 position;  // Position of the enemy
-    float speed;       // Speed of the enemy
-    Color color;       // Color of the enemy
-    int health;        // Health of the enemy
-    float width;       // Collision width of the enemy
-
-    // Pushback and attack cooldown
-    float attackCooldown;      // Time between attacks
-    float lastAttackTime;      // Time of the last attack
-    float pushbackStrength;    // Pushback distance when enemy attacks
-    float collisionRadius;     // Radius for enemy collision detection
-
-    // Constructor
+    Vector2 position;
     Enemy(Vector2 pos, float spd, Color col, int hp);
+    Enemy(const Enemy& other) = default;
+    Enemy(Enemy&& other) noexcept = default;
+    Enemy& operator=(const Enemy& other) = default;
+    Enemy& operator=(Enemy&& other) noexcept = default;
+    virtual ~Enemy() = default;
 
-    // Factory function to create an enemy with level scaling
-    static Enemy CreateEnemy(Vector2 pos, int level);
-
-    // Update method to handle movement and interactions
-    virtual void Update(Vector2 playerPosition, float deltaTime, const std::vector<Object>& objects, Player& player, std::vector<Enemy>& enemies);
-
-
-    // Damage and status methods
-    void TakeDamage(int damage);
+    virtual void Update(Vector2 playerPosition, float deltaTime, const std::vector<Object>& objects, Player& player, std::vector<std::shared_ptr<Enemy>>& enemies);
+    virtual void Draw() const;
+    virtual void TakeDamage(int damage);
     bool IsAlive() const;
-
-    // Draw the enemy
-    void Draw() const;
+    Vector2 GetPosition() const;
+    
 };
 
 #endif

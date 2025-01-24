@@ -40,10 +40,10 @@ void UpdatePlayerMovement(Player &player, float deltaTime, const std::vector<Obj
     const int screenWidth = GetScreenWidth();
     const int screenHeight = GetScreenHeight();
 
-    if (player.position.x < 0) player.position.x = 0;
-    if (player.position.x + player.width > screenWidth) player.position.x = screenWidth - player.width;
-    if (player.position.y < 0) player.position.y = 0;
-    if (player.position.y + player.height > screenHeight) player.position.y = screenHeight - player.height;
+    // if (player.position.x < 0) player.position.x = 0;
+    // if (player.position.x + player.width > screenWidth) player.position.x = screenWidth - player.width;
+    // if (player.position.y < 0) player.position.y = 0;
+    // if (player.position.y + player.height > screenHeight) player.position.y = screenHeight - player.height;
 
     camera.target = (Vector2){ player.position.x + player.width / 2.0f, player.position.y + player.height / 2.0f };
 }

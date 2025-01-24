@@ -26,7 +26,7 @@ public:
     std::vector<Projectile> projectiles;
 
     void Shoot(Vector2 position, Vector2 direction); // Updated method signature
-    void Update(float deltaTime, std::vector<Enemy>& enemies, const std::vector<Object>& objects);
+    void Update(float deltaTime, std::vector<std::shared_ptr<Enemy>> enemies, const std::vector<Object>& objects);
     void Draw() const;
 };
 

@@ -28,7 +28,11 @@ void HandlePlayerInput(Player& player, Attack& playerAttack, std::vector<Object>
     }
 
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && canShoot) {
-        playerAttack.Shoot(player.position, direction);
+        Vector2 shootPosition = {
+            player.position.x + player.texture.width / 2.0f,
+            player.position.y + player.texture.height / 2.0f
+        };
+        playerAttack.Shoot(shootPosition, direction);
         canShoot = false;
     }
 
