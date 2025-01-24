@@ -17,17 +17,12 @@ Enemy::Enemy(Vector2 pos, float spd, Color col, int hp)
 }
 
 void Enemy::Update(Vector2 playerPosition, float deltaTime, const std::vector<Object>& objects, Player& player, std::vector<std::shared_ptr<Enemy>>& enemies) {
-
     Vector2 toPlayer = Vector2Subtract(playerPosition, position);
     Vector2 direction = Vector2Normalize(toPlayer);
     Vector2 movement = Vector2Scale(direction, speed * deltaTime);
     
     position.x += movement.x;
     position.y += movement.y;
-
-    std::cout << "To Player: (" << toPlayer.x << ", " << toPlayer.y << ")\n";
-    std::cout << "Direction: (" << direction.x << ", " << direction.y << ")\n";
-    std::cout << "Movement: (" << movement.x << ", " << movement.y << ")\n";
 
     for (const auto& obj : objects) {
         if (obj.IsActive() && CheckCollisionCircleRec(position, collisionRadius, obj.rect)) {
@@ -51,5 +46,9 @@ void Enemy::TakeDamage(int damage) {
 
 bool Enemy::IsAlive() const {
     return health > 0;
+}
+
+Vector2 Enemy::GetPosition() const {
+    return position;
 }
 

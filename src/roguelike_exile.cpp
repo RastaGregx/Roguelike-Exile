@@ -47,48 +47,39 @@ int main() {
     camera.zoom = 1.0f;
 
     InitGameState(currentScreen, isPlaying, playerDead, player.position, objects, enemies);
+
 while (!WindowShouldClose()) {
     float deltaTime = GetFrameTime();
 
-    UpdateGameState(currentScreen, isPlaying, playerDead, player.position, objects, enemies, player);
-
-    UpdatePlayerMovement(player, deltaTime, objects, camera);
-    HandlePlayerInput(player, playerAttack, objects, deltaTime, camera);
-
-    playerAttack.Update(deltaTime, enemies, objects);
-
-    if (player.hp <= 0 && !playerDead) 
-    {
-        playerDead = true;
-        std::cout << "Player has died.\n";
-    }
-
-    Vector2 playerWorldPos = GetWorldToScreen2D(player.position, camera);
-
-    for (auto it = enemies.begin(); it != enemies.end(); ) {
-        std::cout << "Position Passed to Enemy: (" 
-                  << playerWorldPos.x << ", " << playerWorldPos.y << ")" << std::endl;
-        (*it)->Update(playerWorldPos, deltaTime, objects, player, enemies);
-        if (!(*it)->IsAlive()) { 
-            it = enemies.erase(it);
-        } else {
-            ++it; 
-        }
-    }
+    HandleStates(currentScreen, isPlaying, playerDead, player, player.position, objects, enemies, camera);
+    UpdateGameState(currentScreen, isPlaying, playerDead, player.position, objects, enemies, player, camera);
 
     BeginDrawing();
     ClearBackground(BLACK);
 
-    if (currentScreen == GAMEPLAY) {
-        BeginMode2D(camera);
-        DrawGameplayScreen(objects, enemies, playerAttack, player.position, font, screenWidth, screenHeight, player);
-        playerAttack.Draw();
-        EndMode2D();
-        
-        DrawText(("Health: " + std::to_string(player.hp)).c_str(), 10, 10, 20, RAYWHITE);
-        DrawText(("Position: (" + std::to_string((int)player.position.x) + ", " + std::to_string((int)player.position.y) + ")").c_str(), 10, 40, 20, RAYWHITE);
+    switch(currentScreen) {
+        case TITLE:
+            DrawTitleScreen(font, screenWidth, screenHeight);
+            break;
+        case GAMEPLAY:
+            // Your existing gameplay rendering logic
+            UpdatePlayerMovement(player, deltaTime, objects, camera);
+            HandlePlayerInput(player, playerAttack, objects, deltaTime, camera);
+            playerAttack.Update(deltaTime, enemies, objects);
 
+            BeginMode2D(camera);
+            DrawGameplayScreen(objects, enemies, playerAttack, player.position, font, screenWidth, screenHeight, player);
+            playerAttack.Draw();
+            EndMode2D();
+            
+            DrawText(("Health: " + std::to_string(player.hp)).c_str(), 10, 10, 20, RAYWHITE);
+            DrawText(("Position: (" + std::to_string((int)player.position.x) + ", " + std::to_string((int)player.position.y) + ")").c_str(), 10, 40, 20, RAYWHITE);
+            break;
+        case GAMEOVER:
+            DrawGameOverScreen(font, screenWidth, screenHeight);
+            break;
     }
+
     EndDrawing();
 }
     UnloadFont(font);

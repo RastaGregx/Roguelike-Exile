@@ -11,7 +11,7 @@ void InitPlayer(Player &player, float x, float y, float speed, float width, floa
 }
 
 void Player::TakeDamage(int damage) {
-    hp -= damage;
+    hp += damage;
     if (hp < 0) hp = 0;
 }
 

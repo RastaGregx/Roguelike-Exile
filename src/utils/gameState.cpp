@@ -16,17 +16,20 @@ void InitGameState(GameScreen& currentScreen, bool& isPlaying, bool& playerDead,
     objects.clear();
 }
 
-void UpdateGameState(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, Vector2& playerPosition, std::vector<Object>& objects, std::vector<std::shared_ptr<Enemy>>& enemies, Player& player) {
+void UpdateGameState(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, Vector2& playerPosition, std::vector<Object>& objects, std::vector<std::shared_ptr<Enemy>>& enemies, Player& player, Camera2D& camera) {
     if (playerDead && currentScreen != GAMEOVER) {
         currentScreen = GAMEOVER;
         isPlaying = false;
         return;
     }
 
-    HandleStates(currentScreen, isPlaying, playerDead, player, playerPosition, objects, enemies);
+    for (auto& enemy : enemies) {
+        // Pass the actual player world position, not screen position
+        enemy->Update(player.position, GetFrameTime(), objects, player, enemies);
+    }
 }
 
-void HandleStates(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, Player& player, Vector2& playerPosition, std::vector<Object>& objects, std::vector<std::shared_ptr<Enemy>>& enemies) {
+void HandleStates(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, Player& player, Vector2& playerPosition, std::vector<Object>& objects, std::vector<std::shared_ptr<Enemy>>& enemies, Camera2D& camera) {
     if (currentScreen == TITLE) {
         if (IsKeyPressed(KEY_ENTER)) {
             currentScreen = GAMEPLAY;
@@ -38,7 +41,8 @@ void HandleStates(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, 
 
             InitPlayer(player, playerPosition.x, playerPosition.y, 300.0f, 16.0f, 16.0f, 50, "../assets/sprites/wisp.png");
             
-            enemies.push_back(std::make_shared<Enemy>(player.position, 100.0f, RED, 10));
+            Vector2 enemyPosition = { 400, 400 };
+            enemies.push_back(std::make_shared<Enemy>(enemyPosition, 100.0f, RED, 10));
             objects.push_back(Object(500, 500, 200, 20));
             objects.push_back(Object(500, 500, 20, 200));
         }
@@ -54,6 +58,8 @@ void HandleStates(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, 
         }
     }
     for (auto& enemy : enemies) {
-        enemy->Draw();
+        // Convert enemy world position to screen position for drawing
+        Vector2 enemyScreenPos = GetWorldToScreen2D(enemy->GetPosition(), camera);
+        DrawCircleV(enemyScreenPos, 10, RED); // Example drawing
     }
 }
