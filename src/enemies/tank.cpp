@@ -4,19 +4,34 @@ Tank::Tank(Vector2 pos, float spd, Color col, int hp, float armor, const std::st
     : Enemy(pos, spd, col, hp), armor(armor) {
     // Load the texture from the given path
     texture = LoadTexture(texturePath.c_str());
+
+    // Set sprite-based dimensions for collision
+    if (hasTexture()) {
+        width = static_cast<float>(texture.width);
+        height = static_cast<float>(texture.height);
+    }
+}
+
+Tank::~Tank() {
+    // Unload the texture to prevent memory leaks
+    UnloadTexture(texture);
 }
 
 void Tank::Update(Vector2 playerPosition, float deltaTime, const std::vector<Object>& objects, Player& player, std::vector<std::shared_ptr<Enemy>>& enemies) {
-    // Tank-specific update logic goes here
+    // Call base class update logic
+    Enemy::Update(playerPosition, deltaTime, objects, player, enemies);
+
+    // Additional Tank-specific logic (if needed)
 }
 
 void Tank::TakeDamage(int damage) {
     // Apply armor reduction to the damage
     int finalDamage = static_cast<int>(damage * (1 - armor));
-    Enemy::TakeDamage(finalDamage); // Call base class method to apply damage
+    Enemy::TakeDamage(finalDamage);
 }
 
 bool Tank::hasTexture() const {
+    // Ensure the texture is valid by checking its dimensions
     return texture.width > 0 && texture.height > 0;
 }
 

@@ -6,6 +6,7 @@
 #include "player/player.h"
 #include "raylib.h"
 #include "nlohmann/json.hpp"
+#include "raymath.h"
 #include <fstream>
 #include <vector>
 #include <iostream>
@@ -106,7 +107,12 @@ void HandleStates(GameScreen& currentScreen, bool& isPlaying, bool& playerDead, 
             enemyColor = GREEN;
             enemySize = 20.0f; // Larger size for tanks
             if (tank->hasTexture()) {
-                DrawTextureEx(tank->getTexture(),enemyScreenPos, 0.0f, 2.0f, WHITE);
+                const float SPRITE_SCALE = 2.0f; // Scaling factor for all enemy sprites
+                Vector2 textureOffset = {
+                    (tank->getTexture().width * SPRITE_SCALE) / 2.0f,
+                    (tank->getTexture().height * SPRITE_SCALE) / 2.0f
+                };
+                DrawTextureEx(tank->getTexture(), Vector2Subtract(enemyScreenPos, textureOffset), 0.0f, SPRITE_SCALE, WHITE);
             } else {
                 DrawCircleV(enemyScreenPos, enemySize, enemyColor);
             }

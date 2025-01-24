@@ -3,7 +3,7 @@
       {
         "type": "Tank",
         "position": { "x": 100, "y": 200 },
-        "speed": 2.5,
+        "speed": 50.0,
         "color": "green", 
         "health": 100,
         "attackCooldown": 1.5,
@@ -12,7 +12,7 @@
       {
         "type": "Tank",
         "position": { "x": 200, "y": 300 },
-        "speed": 3.0,
+        "speed": 50.0,
         "color": "blue",
         "health": 120,
         "attackCooldown": 2.0,
