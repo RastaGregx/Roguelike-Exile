@@ -1,7 +1,7 @@
 #include "enemies/tank.h"
 
 Tank::Tank(Vector2 pos, float spd, Color col, int hp, float armor, const std::string& texturePath)
-    : Enemy(pos, spd, col, hp), armor(armor) {
+    : Enemy(pos, spd, col, hp, 0.0f, 0.0f), armor(armor) {
     // Load the texture from the given path
     texture = LoadTexture(texturePath.c_str());
 
@@ -9,6 +9,7 @@ Tank::Tank(Vector2 pos, float spd, Color col, int hp, float armor, const std::st
     if (hasTexture()) {
         width = static_cast<float>(texture.width);
         height = static_cast<float>(texture.height);
+        collisionRadius = (width + height) / 4.0f; // Update collision radius based on texture size
     }
 }
 
